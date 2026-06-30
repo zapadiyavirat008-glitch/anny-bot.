@@ -1,0 +1,44 @@
+name: Run CloudFront Scanner
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:            # Manual "Run workflow" button enable karne ke liye
+
+jobs:
+  run-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # [UPDATED]: Added paramiko library support for SSH handshake emulation
+      - name: Install Dependencies
+        run: pip install requests paramiko
+
+      - name: Generate IP List (56.228.1.1 to 56.228.255.255)
+        run: |
+          python3 -c "
+          import ipaddress
+          start = ipaddress.IPv4Address('18.248.1.1')
+          end = ipaddress.IPv4Address('18.255.255.255')
+          with open('ips.txt', 'w') as f:
+              curr = start
+              while curr <= end:
+                  f.write(f'{curr}\n')
+                  curr += 1
+          "
+
+      - name: Run Script Once
+        env:
+          BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          echo "Starting Smart Tunnel CloudFront scan round..."
+          python cfront_finder.py hosts.txt ips.txt
+          echo "Scan finished successfully."
