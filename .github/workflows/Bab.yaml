@@ -17,16 +17,15 @@ jobs:
         with:
           python-version: '3.11'
 
-      # [UPDATED]: Added paramiko library support for SSH handshake emulation
       - name: Install Dependencies
-        run: pip install requests paramiko
+        run: pip install requests
 
-      - name: Generate IP List (56.228.1.1 to 56.228.255.255)
+      - name: Generate IP List (56.1.1.1 to 56.255.255.255)
         run: |
           python3 -c "
           import ipaddress
-          start = ipaddress.IPv4Address('18.165.1.1')
-          end = ipaddress.IPv4Address('18.165.255.255')
+          start = ipaddress.IPv4Address('56.228.1.1')
+          end = ipaddress.IPv4Address('56.228.255.255')
           with open('ips.txt', 'w') as f:
               curr = start
               while curr <= end:
@@ -36,9 +35,10 @@ jobs:
 
       - name: Run Script Once
         env:
+          # Yeh variables aapke variables/secrets ke naam ke mutabik same hain
           BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: |
-          echo "Starting Smart Tunnel CloudFront scan round..."
+          echo "Starting CloudFront single scan round..."
           python cfront_finder.py hosts.txt ips.txt
           echo "Scan finished successfully."
