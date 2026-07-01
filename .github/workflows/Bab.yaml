@@ -3,7 +3,7 @@ name: Run CloudFront Scanner
 on:
   push:
     branches: [ main ]
-  workflow_dispatch:            # Manual "Run workflow" button enable karne ke liye
+  workflow_dispatch:            # Manuall "Run workflow" button enable karne ke liye
 
 jobs:
   run-scanner:
